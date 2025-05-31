@@ -18,7 +18,7 @@ export default function SignUp() {
     email: '',
     phone: '',
     password: '',
-    skill: ''
+    skills: []
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -54,10 +54,21 @@ export default function SignUp() {
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSkillChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      skills: checked
+        ? [...prev.skills, value]
+        : prev.skills.filter(skill => skill !== value)
+    }));
   };
 
   return (
@@ -146,34 +157,43 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="skill" className="block text-sm font-medium text-gray-700">
-                Select Your Skill
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Your Skills
               </label>
-              <div className="mt-1">
-                <select
-                  id="skill"
-                  name="skill"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={formData.skill}
-                  onChange={handleChange}
-                >
-                  <option value="">Select a skill</option>
-                  {skills.map((skill) => (
-                    <option key={skill} value={skill}>
+              <div className="space-y-2">
+                {skills.map((skill) => (
+                  <div key={skill} className="flex items-center">
+                    <input
+                      id={`skill-${skill}`}
+                      name="skills"
+                      type="checkbox"
+                      value={skill}
+                      checked={formData.skills.includes(skill)}
+                      onChange={handleSkillChange}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor={`skill-${skill}`}
+                      className="ml-2 block text-sm text-gray-900"
+                    >
                       {skill}
-                    </option>
-                  ))}
-                </select>
+                    </label>
+                  </div>
+                ))}
               </div>
+              {formData.skills.length === 0 && (
+                <p className="mt-1 text-sm text-red-600">
+                  Please select at least one skill
+                </p>
+              )}
             </div>
 
             <div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || formData.skills.length === 0}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                  (loading || formData.skills.length === 0) ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {loading ? 'Signing up...' : 'Sign up'}

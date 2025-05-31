@@ -9,13 +9,13 @@ export async function POST(request) {
     const body = await request.json();
     console.log('Received signup request:', { ...body, password: '[REDACTED]' });
 
-    const { name, email, phone, password, skill } = body;
+    const { name, email, phone, password, skills } = body;
 
     // Validate required fields
-    if (!name || !email || !phone || !password || !skill) {
-      console.error('Missing required fields:', { name, email, phone, skill });
+    if (!name || !email || !phone || !password || !skills || skills.length === 0) {
+      console.error('Missing required fields:', { name, email, phone, skills });
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'All fields are required and at least one skill must be selected' },
         { status: 400 }
       );
     }
@@ -43,7 +43,7 @@ export async function POST(request) {
         email,
         phone,
         password: hashedPassword,
-        skill,
+        skills, // Now storing array of skills
       },
     });
 
